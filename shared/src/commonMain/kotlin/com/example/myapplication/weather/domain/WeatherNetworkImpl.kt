@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.flow
  * комбинаций в разных местах. Один запрос - один ответ
  *
  */
-abstract class WeatherNetworkImpl : HttpBuilder(), WeatherUseCase {
+class WeatherNetworkImpl : HttpBuilder(), WeatherUseCase {
 
     /**
      * Поиск информации о городе по его названию

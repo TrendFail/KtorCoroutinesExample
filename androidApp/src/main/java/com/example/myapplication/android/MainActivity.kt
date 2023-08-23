@@ -73,7 +73,6 @@ fun GreetingView() {
             WeatherApi().combinedApi(onResult = {
                 thirdResultText = it
             })
-            WeatherApi().withAsync {  }
         }
         ) {
             Text(text = "combined request")

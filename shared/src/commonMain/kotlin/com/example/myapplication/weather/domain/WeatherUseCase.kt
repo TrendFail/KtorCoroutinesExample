@@ -4,7 +4,7 @@ import com.example.myapplication.weather.domain.model.CitySearchResult
 import com.example.myapplication.weather.domain.model.WeatherByCoordinates
 import kotlinx.coroutines.flow.Flow
 
-internal interface WeatherUseCase {
+interface WeatherUseCase {
 
     /**
      * Поиск информации о городе по его названию

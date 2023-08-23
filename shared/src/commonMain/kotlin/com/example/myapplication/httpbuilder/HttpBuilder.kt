@@ -12,11 +12,7 @@ import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.request.url
 import io.ktor.serialization.kotlinx.json.json
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
 abstract class HttpBuilder {
@@ -39,10 +35,6 @@ abstract class HttpBuilder {
             }
         }
     }
-
-    fun withAsync(block: suspend CoroutineScope.() -> Unit): Job =
-        CoroutineScope(Dispatchers.Default).launch(block = block)
-
 
 }
 

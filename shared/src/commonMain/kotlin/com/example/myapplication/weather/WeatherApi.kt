@@ -1,5 +1,6 @@
 package com.example.myapplication.weather
 
+import com.example.myapplication.httpbuilder.NetworkHelper
 import com.example.myapplication.weather.domain.WeatherNetworkImpl
 import com.example.myapplication.weather.domain.model.toSearchCityResult
 import com.example.myapplication.weather.model.SearchCityResult
@@ -7,7 +8,12 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flatMapLatest
 
-class WeatherApi : WeatherNetworkImpl() {
+class WeatherApi: NetworkHelper() {
+
+    private val networkImplementation by lazy { WeatherNetworkImpl() }
+
+
+
 
     /**
      * Пример единичного запроса
@@ -16,7 +22,7 @@ class WeatherApi : WeatherNetworkImpl() {
      */
     fun searchCity(cityName: String, onResult: (SearchCityResult?) -> Unit) {
         withAsync {
-            searchCityUseCase(cityName).collect {
+            networkImplementation.searchCityUseCase(cityName).collect {
                 onResult(it.toSearchCityResult())
             }
         }
@@ -34,14 +40,14 @@ class WeatherApi : WeatherNetworkImpl() {
     ) {
         withAsync {
             //Первый запрос
-            searchCityUseCase(cityName)
+            networkImplementation.searchCityUseCase(cityName)
                 .flatMapLatest { searchResult ->
                     //Можем обработать первый запрос
                     onResult("city", searchResult.result.first().name)
                     //Добавим задержку для имитации долгой работы
                     delay(1000)
                     //Второй запрос, для которого нужны значения из первого
-                    getWeatherByCoordinatesUseCase(
+                    networkImplementation.getWeatherByCoordinatesUseCase(
                         searchResult.result.first().latitude,
                         searchResult.result.first().longitude
                     )
@@ -59,16 +65,16 @@ class WeatherApi : WeatherNetworkImpl() {
      * свой результат в callback
      */
     fun combinedApi(onResult: (String) -> Unit) {
-        withAsync { longTimeRequestUseCase(100L, 1).collect { onResult(it.toString()) } }
-        withAsync { longTimeRequestUseCase(2500L, 2).collect { onResult(it.toString()) } }
-        withAsync { longTimeRequestUseCase(300L, 3).collect { onResult(it.toString()) } }
-        withAsync { longTimeRequestUseCase(3000L, 4).collect { onResult(it.toString()) } }
-        withAsync { longTimeRequestUseCase(1500L, 5).collect { onResult(it.toString()) } }
-        withAsync { longTimeRequestUseCase(500L, 6).collect { onResult(it.toString()) } }
-        withAsync { longTimeRequestUseCase(1000L, 7).collect { onResult(it.toString()) } }
-        withAsync { longTimeRequestUseCase(200L, 8).collect { onResult(it.toString()) } }
-        withAsync { longTimeRequestUseCase(2000L, 9).collect { onResult(it.toString()) } }
-        withAsync { longTimeRequestUseCase(400L, 10).collect { onResult(it.toString()) } }
+        withAsync { networkImplementation.longTimeRequestUseCase(100L, 1).collect { onResult(it.toString()) } }
+        withAsync { networkImplementation.longTimeRequestUseCase(2500L, 2).collect { onResult(it.toString()) } }
+        withAsync { networkImplementation.longTimeRequestUseCase(300L, 3).collect { onResult(it.toString()) } }
+        withAsync { networkImplementation.longTimeRequestUseCase(3000L, 4).collect { onResult(it.toString()) } }
+        withAsync { networkImplementation.longTimeRequestUseCase(1500L, 5).collect { onResult(it.toString()) } }
+        withAsync { networkImplementation.longTimeRequestUseCase(500L, 6).collect { onResult(it.toString()) } }
+        withAsync { networkImplementation.longTimeRequestUseCase(1000L, 7).collect { onResult(it.toString()) } }
+        withAsync { networkImplementation.longTimeRequestUseCase(200L, 8).collect { onResult(it.toString()) } }
+        withAsync { networkImplementation.longTimeRequestUseCase(2000L, 9).collect { onResult(it.toString()) } }
+        withAsync { networkImplementation.longTimeRequestUseCase(400L, 10).collect { onResult(it.toString()) } }
     }
 
 
