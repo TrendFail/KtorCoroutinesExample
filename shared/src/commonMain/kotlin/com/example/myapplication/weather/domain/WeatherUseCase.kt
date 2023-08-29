@@ -2,6 +2,7 @@ package com.example.myapplication.weather.domain
 
 import com.example.myapplication.weather.domain.model.CitySearchResult
 import com.example.myapplication.weather.domain.model.WeatherByCoordinates
+import com.example.myapplication.weather.model.SearchCityResult
 import kotlinx.coroutines.flow.Flow
 
 interface WeatherUseCase {
@@ -9,13 +10,13 @@ interface WeatherUseCase {
     /**
      * Поиск информации о городе по его названию
      */
-    suspend fun searchCityUseCase(cityName: String): Flow<CitySearchResult>
+    fun searchCityUseCase(cityName: String): Flow<CitySearchResult>
 
     /**
      * Получение погоды по координатам
      *
      */
-    suspend fun getWeatherByCoordinatesUseCase(
+    fun getWeatherByCoordinatesUseCase(
         latitude: Double,
         longitude: Double,
     ): Flow<WeatherByCoordinates>
@@ -23,5 +24,12 @@ interface WeatherUseCase {
     /**
      * Пример любой долгой flow задачи
      */
-    suspend fun longTimeRequestUseCase(delayTime: Long, count: Int): Flow<Int>
+    fun longTimeRequestUseCase(delayTime: Long, count: Int): Flow<Int>
+
+    suspend fun searchSuspendCity(cityName:String): SearchCityResult
+
+    suspend fun getSuspendByCoordinates(
+        latitude: Double,
+        longitude: Double,
+    ): WeatherByCoordinates
 }

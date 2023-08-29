@@ -2,8 +2,11 @@ package com.example.myapplication.weather.domain
 
 import com.example.myapplication.httpbuilder.HttpBuilder
 import com.example.myapplication.httpbuilder.networkGet
+import com.example.myapplication.httpbuilder.networkGetNotFlow
 import com.example.myapplication.weather.domain.model.CitySearchResult
 import com.example.myapplication.weather.domain.model.WeatherByCoordinates
+import com.example.myapplication.weather.domain.model.toSearchCityResult
+import com.example.myapplication.weather.model.SearchCityResult
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -19,7 +22,7 @@ class WeatherNetworkImpl : HttpBuilder(), WeatherUseCase {
     /**
      * Поиск информации о городе по его названию
      */
-    override suspend fun searchCityUseCase(cityName: String): Flow<CitySearchResult> =
+    override fun searchCityUseCase(cityName: String): Flow<CitySearchResult> =
         networkGet(
             url = "https://geocoding-api.open-meteo.com/v1/search",
             parameters = listOf("name" to cityName)
@@ -29,7 +32,7 @@ class WeatherNetworkImpl : HttpBuilder(), WeatherUseCase {
      * Получение погоды по координатам
      *
      */
-    override suspend fun getWeatherByCoordinatesUseCase(
+    override fun getWeatherByCoordinatesUseCase(
         latitude: Double,
         longitude: Double,
     ): Flow<WeatherByCoordinates> =
@@ -45,9 +48,29 @@ class WeatherNetworkImpl : HttpBuilder(), WeatherUseCase {
     /**
      * Пример любой долгой flow задачи
      */
-    override suspend fun longTimeRequestUseCase(delayTime: Long, count: Int): Flow<Int> = flow {
+    override fun longTimeRequestUseCase(delayTime: Long, count: Int): Flow<Int> = flow {
         delay(delayTime)
         emit(count)
     }
+
+
+    override suspend fun searchSuspendCity(cityName: String): SearchCityResult =
+        networkGetNotFlow<CitySearchResult>(
+            url = "https://geocoding-api.open-meteo.com/v1/search",
+            parameters = listOf("name" to cityName)
+        ).toSearchCityResult()
+
+    override suspend fun getSuspendByCoordinates(
+        latitude: Double,
+        longitude: Double,
+    ): WeatherByCoordinates = networkGetNotFlow<WeatherByCoordinates>(
+        url = "https://api.open-meteo.com/v1/forecast",
+        parameters = listOf(
+            "latitude" to latitude,
+            "longitude" to longitude,
+            "hourly" to "temperature_2m"
+        )
+    )
+
 
 }

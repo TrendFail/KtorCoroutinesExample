@@ -2,6 +2,7 @@ package com.example.myapplication.httpbuilder
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
@@ -19,7 +20,12 @@ abstract class HttpBuilder {
 
     val client by lazy {
         HttpClient {
-            expectSuccess = false
+            expectSuccess = true
+            HttpResponseValidator {
+                handleResponseExceptionWithRequest { cause, request ->
+                    println("SOME REQUEST ERROR! ${cause.message}")
+                }
+            }
             install(Logging) {
                 logger = Logger.SIMPLE
                 level = LogLevel.INFO
@@ -38,9 +44,10 @@ abstract class HttpBuilder {
 
 }
 
-suspend inline fun <reified T> HttpBuilder.networkGet(
+ inline fun <reified T> HttpBuilder.networkGet(
     url: String,
     parameters: List<Pair<String, Any?>> = emptyList(),
+
 ) = flow {
     emit(client.get {
         this.url(url)
@@ -50,6 +57,20 @@ suspend inline fun <reified T> HttpBuilder.networkGet(
         appendTokenAndCity()
     }.body<T>())
 }
+
+suspend inline fun <reified T> HttpBuilder.networkGetNotFlow(
+    url: String,
+    parameters: List<Pair<String, Any?>> = emptyList(),
+    ) =
+    client.get {
+        this.url(url)
+        parameters.forEach {
+            parameter(it.first, it.second)
+        }
+        appendTokenAndCity()
+    }.body<T>()
+
+
 
 
 fun HttpRequestBuilder.appendTokenAndCity(): HttpRequestBuilder = this.apply {

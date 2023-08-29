@@ -35,50 +35,30 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun GreetingView() {
+fun GreetingView(viewModel: ExampleViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
 
-    var firstResultText by remember { mutableStateOf("empty") }
-    var secondResultText by remember { mutableStateOf("empty") }
-    var thirdResultText by remember { mutableStateOf("empty") }
+
 
     Column(modifier = Modifier.fillMaxSize()) {
-        Button(onClick = {
-            WeatherApi().searchCity(
-                cityName = "Moscow",
-                onResult = {
-                    firstResultText = it?.cityName.orEmpty()
-                })
-        }
-        ) {
+        Button(onClick = viewModel::getCity) {
             Text(text = "Single request")
         }
 
-        Text(text = firstResultText)
+        Text(text = viewModel.firstResultText)
 
-        Button(onClick = {
-            WeatherApi().searchCityAndGetWeather(
-                cityName = "Moscow",
-                onResult = { temperature, unit ->
-                    secondResultText = "$temperature, $unit"
-                }
-            )
-        }
+        Button(onClick = viewModel::getWeather
         ) {
             Text(text = "Consistently request")
         }
 
-        Text(text = secondResultText)
+        Text(text = viewModel.secondResultText)
 
-        Button(onClick = {
-            WeatherApi().combinedApi(onResult = {
-                thirdResultText = it
-            })
-        }
+        Button(onClick = viewModel::getSuspendWeather
         ) {
             Text(text = "combined request")
         }
 
-        Text(text = thirdResultText)
+        Text(text = viewModel.thirdResultText)
 
 
     }
