@@ -3,6 +3,7 @@ package com.example.myapplication.weather
 import com.example.myapplication.httpbuilder.NetworkHelper
 import com.example.myapplication.weather.domain.WeatherNetworkImpl
 import com.example.myapplication.weather.domain.WeatherUseCase
+import com.example.myapplication.weather.domain.model.CitySearchResult
 import com.example.myapplication.weather.domain.model.toSearchCityResult
 import com.example.myapplication.weather.model.SearchCityResult
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -13,6 +14,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -27,10 +29,26 @@ class WeatherApi : NetworkHelper() {
      * выполнение запроса происходит асинхронно. В callback возвращается смапленный от сервера результат
      * В данном случае производим поиск городов по названию, после чего возвращаем первый попавшийся результат
      */
-    fun searchCity(cityName: String, onResult: (SearchCityResult?) -> Unit) {
-        withAsync {
+    fun searchCity(cityName: String, onResult: (SearchCityResult) -> Unit):Job {
+        return withAsync {
             networkImplementation.searchCityUseCase(cityName).collect {
+                onResult(SearchCityResult("TestName", 0.0,0.0, "Test Country"))
+
+                launch {
+                    println("Start job 1")
+                    delay(2000)
+                    println("End job 1")
+                }
+                launch {
+                    println("Start job 2")
+                    delay(3000)
+                    println("End job 2")
+                }
+
+                delay(1000)
+                println("start request")
                 onResult(it.toSearchCityResult())
+                println("end request")
             }
         }
     }
@@ -73,47 +91,8 @@ class WeatherApi : NetworkHelper() {
      * Пример параллельных множественных запросов. Каждый запрос выполняется асинхронно и бросает
      * свой результат в callback
      */
-    fun combinedApi(onResult: (String) -> Unit) {
-        withAsync {
-            networkImplementation.longTimeRequestUseCase(100L, 1)
-                .collect { onResult(it.toString()) }
-        }
-        withAsync {
-            networkImplementation.longTimeRequestUseCase(2500L, 2)
-                .collect { onResult(it.toString()) }
-        }
-        withAsync {
-            networkImplementation.longTimeRequestUseCase(300L, 3)
-                .collect { onResult(it.toString()) }
-        }
-        withAsync {
-            networkImplementation.longTimeRequestUseCase(3000L, 4)
-                .collect { onResult(it.toString()) }
-        }
-        withAsync {
-            networkImplementation.longTimeRequestUseCase(1500L, 5)
-                .collect { onResult(it.toString()) }
-        }
-        withAsync {
-            networkImplementation.longTimeRequestUseCase(500L, 6)
-                .collect { onResult(it.toString()) }
-        }
-        withAsync {
-            networkImplementation.longTimeRequestUseCase(1000L, 7)
-                .collect { onResult(it.toString()) }
-        }
-        withAsync {
-            networkImplementation.longTimeRequestUseCase(200L, 8)
-                .collect { onResult(it.toString()) }
-        }
-        withAsync {
-            networkImplementation.longTimeRequestUseCase(2000L, 9)
-                .collect { onResult(it.toString()) }
-        }
-        withAsync {
-            networkImplementation.longTimeRequestUseCase(400L, 10)
-                .collect { onResult(it.toString()) }
-        }
+    fun combinedApi(): Flow<CitySearchResult> {
+        return networkImplementation.searchCityUseCase("Moscow")
     }
 
     @Throws(CustomThrow::class, CancellationException::class)

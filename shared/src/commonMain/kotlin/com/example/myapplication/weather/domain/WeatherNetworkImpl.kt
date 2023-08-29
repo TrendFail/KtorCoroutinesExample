@@ -28,6 +28,17 @@ class WeatherNetworkImpl : HttpBuilder(), WeatherUseCase {
             parameters = listOf("name" to cityName)
         )
 
+    fun someFlowExample(inParameter: String):Flow<String> = flow {
+        emit("Start")
+        delay(1000)
+        emit("second")
+        delay(1000)
+        emit("third")
+        delay(1000)
+        emit("fourth")
+    }
+
+
     /**
      * Получение погоды по координатам
      *

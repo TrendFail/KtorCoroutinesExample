@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.weather.CustomThrow
 import com.example.myapplication.weather.WeatherApi
+import com.example.myapplication.weather.domain.WeatherNetworkImpl
 import kotlinx.coroutines.launch
 
 class ExampleViewModel:ViewModel() {
@@ -19,14 +20,23 @@ class ExampleViewModel:ViewModel() {
 
     fun getCity() {
         weatherApi.searchCity("Moscow") {
-            firstResultText = it?.cityName.orEmpty()
+            firstResultText = it.cityName
         }
     }
 
     fun getWeather() {
-        weatherApi.searchCityAndGetWeather("Moscow") { temperature, unit ->
-            secondResultText = "$temperature, $unit"
+
+        viewModelScope.launch {
+            WeatherNetworkImpl().someFlowExample("Moscow").collect {
+                secondResultText = it
+            }
+
         }
+
+//
+//        weatherApi.searchCityAndGetWeather("Moscow") { temperature, unit ->
+//            secondResultText = "$temperature, $unit"
+//        }
     }
 
     fun getSuspendWeather() {
