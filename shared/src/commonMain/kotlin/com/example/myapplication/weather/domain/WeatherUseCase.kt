@@ -24,7 +24,6 @@ interface WeatherUseCase {
     /**
      * Пример любой долгой flow задачи
      */
-    fun longTimeRequestUseCase(delayTime: Long, count: Int): Flow<Int>
 
     suspend fun searchSuspendCity(cityName:String): SearchCityResult
 

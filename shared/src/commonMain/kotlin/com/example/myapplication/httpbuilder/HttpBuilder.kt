@@ -22,7 +22,7 @@ abstract class HttpBuilder {
         HttpClient {
             expectSuccess = true
             HttpResponseValidator {
-                handleResponseExceptionWithRequest { cause, request ->
+                handleResponseExceptionWithRequest { cause, _ ->
                     println("SOME REQUEST ERROR! ${cause.message}")
                 }
             }
@@ -47,7 +47,6 @@ abstract class HttpBuilder {
  inline fun <reified T> HttpBuilder.networkGet(
     url: String,
     parameters: List<Pair<String, Any?>> = emptyList(),
-
 ) = flow {
     emit(client.get {
         this.url(url)

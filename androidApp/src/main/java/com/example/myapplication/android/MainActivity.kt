@@ -10,13 +10,9 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.myapplication.weather.WeatherApi
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,34 +31,34 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun GreetingView(viewModel: ExampleViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
+fun GreetingView(
+    viewModel: ExampleViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
+    ) {
 
-
-
-    Column(modifier = Modifier.fillMaxSize()) {
-        Button(onClick = viewModel::getCity) {
-            Text(text = "Single request")
-        }
-
-        Text(text = viewModel.firstResultText)
-
-        Button(onClick = viewModel::getWeather
-        ) {
-            Text(text = "Consistently request")
-        }
-
-        Text(text = viewModel.secondResultText)
-
-        Button(onClick = viewModel::getSuspendWeather
-        ) {
-            Text(text = "combined request")
-        }
-
-        Text(text = viewModel.thirdResultText)
-
-
+    LaunchedEffect(Unit) {
+        println("VIEWMODEL: $viewModel")
     }
 
+    Column(modifier = Modifier.fillMaxSize()) {
+        Button(onClick = viewModel::stopRequestManually) {
+            Text(text = "CancelRequest")
+        }
+        Text(text = viewModel.requestStatus)
+
+        Button(
+            onClick = viewModel::getCountryByCity
+        ) {
+            Text(text = "Get Country")
+        }
+        Text(text = viewModel.countyResult)
+
+        Button(
+            onClick = viewModel::getWeatherByCity
+        ) {
+            Text(text = "Get Weather")
+        }
+        Text(text = viewModel.weatherResult)
+    }
 }
 
 @Preview

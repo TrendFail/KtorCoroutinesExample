@@ -5,42 +5,46 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.myapplication.weather.CustomThrow
 import com.example.myapplication.weather.WeatherApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
-class ExampleViewModel:ViewModel() {
+class ExampleViewModel : ViewModel() {
 
-    val weatherApi = WeatherApi()
+    private val weatherApi by lazy { WeatherApi() }
 
-    var firstResultText by mutableStateOf("empty")
-    var secondResultText by  mutableStateOf("empty")
-    var thirdResultText by  mutableStateOf("empty")
+    var requestStatus by mutableStateOf("")
+    var countyResult by mutableStateOf("")
+    var weatherResult by mutableStateOf("")
 
-    fun getCity() {
-        weatherApi.searchCity("Moscow") {
-            firstResultText = it?.cityName.orEmpty()
-        }
+    private var cancellable: Job? = null
+
+    fun stopRequestManually() {
+        cancellable?.cancel()
+        requestStatus = "cancelled"
+        countyResult = ""
+        weatherResult = ""
     }
 
-    fun getWeather() {
-        weatherApi.searchCityAndGetWeather("Moscow") { temperature, unit ->
-            secondResultText = "$temperature, $unit"
-        }
-    }
-
-    fun getSuspendWeather() {
+    fun getCountryByCity() {
         viewModelScope.launch {
-            thirdResultText = try {
-                //Пример работы с ошибкой через Throwable. Вполне удобно в Android,
-                // но совсем неудобно в iOS
-                weatherApi.getWeatherSuspend("Moscow")
-            } catch (e:CustomThrow) {
-                "${e.msg} ${e.code}"
+            requestStatus = "get country..."
+            weatherApi.getCountryByCity("Moscow") { result ->
+                requestStatus = "Complete"
+                countyResult = result
             }
         }
     }
 
+    fun getWeatherByCity() {
+        viewModelScope.launch {
+            requestStatus = "get weather..."
+            cancellable = weatherApi.getWeatherByCity("Moscow") {result ->
+                requestStatus = "Complete"
+                weatherResult = result
+            }
+        }
+    }
 
 
 }
