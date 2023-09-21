@@ -1,5 +1,6 @@
 package com.example.myapplication.weather
 
+import com.example.myapplication.httpbuilder.handleErrors
 import com.example.myapplication.isAndroid
 import com.example.myapplication.weather.domain.WeatherNetworkImpl
 import com.example.myapplication.weather.domain.WeatherUseCase
@@ -26,7 +27,15 @@ class WeatherApi {
      * @receiver
      */
     suspend fun getCountryByCity(cityName: String, success: (String) -> Unit) = kmpScope {
-        val country = networkImplementation.searchSuspendCity(cityName).country
+        val country = networkImplementation.searchSuspendCity(cityName)
+        launch {
+            delay(1000)
+            println("1000 _ 1")
+        }
+        launch {
+            delay(1000)
+            println("1000 _ 2")
+        }
         success("Country: $country")
     }
 
@@ -37,21 +46,17 @@ class WeatherApi {
     suspend fun getWeatherByCity(cityName: String, success: (String) -> Unit) = kmpScope {
         success("get coordinates...")
         networkImplementation.searchCityUseCase(cityName).flatMapLatest { searchResult ->
-            success("get weather")
-            delay(700)
-            success("get weather.")
-            delay(700)
-            success("get weather..")
-            delay(700)
-            success("get weather...")
-            delay(700)
             networkImplementation.getWeatherByCoordinatesUseCase(
                 searchResult.result.first().latitude,
                 searchResult.result.first().longitude
             )
-        }.collect {
-            success("${it.hourly.temperatureList.last()} ${it.units.temperatureUnit}")
         }
+            .handleErrors { handleException ->
+                println("ERROR $handleException")
+            }
+            .collect {
+                success("${it.hourly.temperatureList.last()} ${it.units.temperatureUnit}")
+            }
     }
 
 
@@ -71,5 +76,7 @@ suspend fun kmpScope(block: suspend CoroutineScope.() -> Unit): Job {
         } else {
             SupervisorJob() + Dispatchers.Main
         }
-    ).launch(block = block)
+    ).launch(block =
+    block
+    )
 }

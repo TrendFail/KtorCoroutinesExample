@@ -22,7 +22,8 @@ class WeatherNetworkImpl : HttpBuilder(), WeatherUseCase {
      */
     override fun searchCityUseCase(cityName: String): Flow<CitySearchResult> =
         networkGet(
-            url = "https://geocoding-api.open-meteo.com/v1/search",
+//            url = "https://geocoding-api.open-meteo.com/v1/search",
+            url = "https://yandex.ru",
             parameters = listOf("name" to cityName)
         )
 
@@ -45,7 +46,8 @@ class WeatherNetworkImpl : HttpBuilder(), WeatherUseCase {
 
     override suspend fun searchSuspendCity(cityName: String): SearchCityResult =
         networkGetNotFlow<CitySearchResult>(
-            url = "https://geocoding-api.open-meteo.com/v1/search",
+//            url = "https://geocoding-api.open-meteo.com/v1/search",
+            url = "https://yandex.ru",
             parameters = listOf("name" to cityName)
         ).toSearchCityResult()
 
