@@ -20,10 +20,10 @@ class WeatherNetworkImpl : HttpBuilder(), WeatherUseCase {
     /**
      * Поиск информации о городе по его названию
      */
-    override fun searchCityUseCase(cityName: String): Flow<CitySearchResult> =
+    override fun searchCityUseCase(cityName: String): Flow<Unit> =
         networkGet(
 //            url = "https://geocoding-api.open-meteo.com/v1/search",
-            url = "https://yandex.ru",
+            url = "https://yand213123ex.ru",
             parameters = listOf("name" to cityName)
         )
 

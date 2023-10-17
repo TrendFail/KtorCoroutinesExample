@@ -4,13 +4,18 @@ import com.example.myapplication.httpbuilder.handleErrors
 import com.example.myapplication.isAndroid
 import com.example.myapplication.weather.domain.WeatherNetworkImpl
 import com.example.myapplication.weather.domain.WeatherUseCase
+import com.example.myapplication.weather.domain.model.WeatherByCoordinates
+import com.example.myapplication.weather.domain.model.WeatherHourly
+import com.example.myapplication.weather.domain.model.WeatherUnits
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlin.coroutines.coroutineContext
 
@@ -45,16 +50,22 @@ class WeatherApi {
     @OptIn(ExperimentalCoroutinesApi::class)
     suspend fun getWeatherByCity(cityName: String, success: (String) -> Unit) = kmpScope {
         success("get coordinates...")
-        networkImplementation.searchCityUseCase(cityName).flatMapLatest { searchResult ->
-            networkImplementation.getWeatherByCoordinatesUseCase(
-                searchResult.result.first().latitude,
-                searchResult.result.first().longitude
-            )
+        networkImplementation.searchCityUseCase(cityName)
+            .flatMapLatest { searchResult ->
+//            networkImplementation.getWeatherByCoordinatesUseCase(
+//                searchResult.result.first().latitude,
+//                searchResult.result.first().longitude
+//            )
+                flow { emit(WeatherByCoordinates(
+                    WeatherUnits("--"), WeatherHourly(listOf(1.0f))
+                ))  }
+//            emptyFlow<WeatherByCoordinates>()
         }
             .handleErrors { handleException ->
                 println("ERROR $handleException")
             }
             .collect {
+                println("OLOLOLOLOLOLOLOOLOLOLOLOLOLOLOOLOLOLOLOLOLOLOOLOLOLOLOLOLOLOOLOLOLOLOLOLOLO")
                 success("${it.hourly.temperatureList.last()} ${it.units.temperatureUnit}")
             }
     }

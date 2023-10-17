@@ -10,7 +10,7 @@ interface WeatherUseCase {
     /**
      * Поиск информации о городе по его названию
      */
-    fun searchCityUseCase(cityName: String): Flow<CitySearchResult>
+    fun searchCityUseCase(cityName: String): Flow<Unit>
 
     /**
      * Получение погоды по координатам
